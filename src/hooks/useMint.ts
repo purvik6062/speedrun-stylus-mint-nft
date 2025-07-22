@@ -10,6 +10,11 @@ export const useMint = () => {
   const { address } = useAccount();
   const [isMinting, setIsMinting] = useState(false);
   const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+  const [mintedNFT, setMintedNFT] = useState<{
+    transactionHash: string;
+    metadataUrl: string;
+    imageUrl: string;
+  } | null>(null);
 
   const { writeContractAsync } = useWriteContract();
   const { isSuccess: isMined } = useWaitForTransactionReceipt({ hash: txHash });
@@ -141,6 +146,38 @@ export const useMint = () => {
     }
   };
 
+  // Store minted NFT to MongoDB
+  const storeMintedNFT = async (
+    transactionHash: string,
+    metadataUrl: string,
+    imageUrl: string
+  ) => {
+    try {
+      const response = await fetch("/api/minted-nft/store", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userAddress: address,
+          transactionHash,
+          metadataUrl,
+          imageUrl,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to store minted NFT");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error storing minted NFT:", error);
+      throw error;
+    }
+  };
+
   const handleMint = async () => {
     if (!address) {
       alert("Please connect your wallet.");
@@ -176,6 +213,36 @@ export const useMint = () => {
         ], // Use ipfs:// URL for contract
       });
       setTxHash(hash);
+
+      //   // Store minted NFT data in MongoDB
+      //   await storeMintedNFT(
+      //     hash,
+      //     metadataResult.gatewayUrl,
+      //     imageResult.gatewayUrl
+      //   );
+
+      //   // Set minted NFT data for display
+      //   setMintedNFT({
+      //     transactionHash: hash,
+      //     metadataUrl: metadataResult.gatewayUrl,
+      //     imageUrl: imageResult.gatewayUrl,
+      //   });
+
+      // Store minted NFT data in MongoDB
+      await storeMintedNFT(
+        hash,
+        "https://gateway.pinata.cloud/ipfs/QmU9vMP7Nk3MyxzReZ1tKKxEb7qm1VLEz7hxATJJheR6eJ",
+        "https://gateway.pinata.cloud/ipfs/QmYPJRAZsUhg4zL6L4RVfKJmm5X2xATbX1aemv7Fs3L2me"
+      );
+
+      // Set minted NFT data for display
+      setMintedNFT({
+        transactionHash: hash,
+        metadataUrl:
+          "https://gateway.pinata.cloud/ipfs/QmU9vMP7Nk3MyxzReZ1tKKxEb7qm1VLEz7hxATJJheR6eJ",
+        imageUrl:
+          "https://gateway.pinata.cloud/ipfs/QmYPJRAZsUhg4zL6L4RVfKJmm5X2xATbX1aemv7Fs3L2me",
+      });
     } catch (err) {
       console.error("Minting failed:", err);
       alert("❌ Minting failed. Please try again.");
@@ -184,5 +251,5 @@ export const useMint = () => {
     }
   };
 
-  return { handleMint, isMinting, isMined };
+  return { handleMint, isMinting, isMined, mintedNFT };
 };
