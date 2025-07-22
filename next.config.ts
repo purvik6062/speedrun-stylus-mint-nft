@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     domains: [
-      "gateway.pinata.cloud",
+      "gateway.pinata.cloud", //added pinata gateway domain to allow images to be displayed
     ],
   },
 };
