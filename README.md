@@ -1,36 +1,186 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SpeedRun Stylus NFT Mint App
 
-## Getting Started
+A Next.js 15 application that allows users to mint NFTs after completing the first three SpeedRun Stylus challenges.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 🔗 **Privy Wallet Integration**: Secure wallet connection using Privy
+- 🏆 **Challenge Verification**: Automatically checks completion of the first 3 SpeedRun Stylus challenges
+- 🎨 **Beautiful UI**: Modern gradient design with responsive layout
+- 🗄️ **PostgreSQL Integration**: Uses Drizzle ORM for database operations
+- ⚡ **Real-time Status**: Dynamic progress tracking and eligibility checking
+- 🎖️ **NFT Minting**: Mint exclusive NFT badges for challenge completion
+
+## Required Challenges
+
+To be eligible for NFT minting, users must complete these challenges with "ACCEPTED" status:
+
+1. **Simple Counter Example** (`simple-counter-example`)
+2. **Simple NFT Example** (`simple-nft-example`)
+3. **Vending Machine** (`vending-machine`)
+
+## Setup Instructions
+
+### 1. Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Database URL (already configured for your Neon database)
+POSTGRES_URL="postgresql://neondb_owner:npg_T1IcufZn2bxv@ep-weathered-sunset-a46hr45i-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require"
+
+# Privy Configuration
+NEXT_PUBLIC_PRIVY_APP_ID="your-privy-app-id-here"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Get Privy App ID
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Go to [Privy Dashboard](https://dashboard.privy.io)
+2. Create a new app or use an existing one
+3. Copy your App ID
+4. Replace `your-privy-app-id-here` in `.env.local` with your actual App ID
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Install Dependencies & Run
 
-## Learn More
+```bash
+# Install dependencies (already done)
+npm install
 
-To learn more about Next.js, take a look at the following resources:
+# Start the development server
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The app will be available at `http://localhost:3000`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## How It Works
 
-## Deploy on Vercel
+### 1. Wallet Connection
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Users connect their wallet using Privy
+- Supports both external wallets and embedded wallets
+- Secure authentication flow
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Challenge Verification
+
+- App queries the PostgreSQL database for user submissions
+- Checks for completion of the required 3 challenges
+- Verifies that submissions have "ACCEPTED" review status
+- Displays real-time progress with visual indicators
+
+### 3. NFT Minting
+
+- Mint button appears only when all conditions are met
+- Currently shows a placeholder implementation
+- Ready to integrate actual NFT minting logic
+
+## Database Schema
+
+The app uses the existing `user_challenges` table with the following key fields:
+
+- `user_address`: Ethereum wallet address
+- `challenge_id`: ID of the completed challenge
+- `review_action`: Status (REJECTED, ACCEPTED, SUBMITTED)
+- `submitted_at`: Timestamp of submission
+
+## API Endpoints
+
+### POST `/api/check-eligibility`
+
+Checks if a user is eligible for NFT minting.
+
+**Request Body:**
+
+```json
+{
+  "userAddress": "0x..."
+}
+```
+
+**Response:**
+
+```json
+{
+  "isEligible": boolean,
+  "userAddress": string,
+  "completedChallenges": number,
+  "requiredChallenges": number,
+  "challengeDetails": [
+    {
+      "id": string,
+      "completed": boolean,
+      "details": object | null
+    }
+  ]
+}
+```
+
+## Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Authentication**: Privy
+- **Database**: PostgreSQL with Drizzle ORM
+- **Styling**: Tailwind CSS
+- **State Management**: React Query (TanStack Query)
+- **TypeScript**: Full type safety
+
+## Development
+
+### Project Structure
+
+```
+src/
+├── app/
+│   ├── api/check-eligibility/    # API route for eligibility checking
+│   ├── layout.tsx                # Root layout with providers
+│   └── page.tsx                  # Main homepage component
+├── components/
+│   └── providers.tsx             # Privy and React Query providers
+├── hooks/
+│   └── useEligibility.ts         # Custom hook for eligibility checking
+└── lib/
+    ├── database/
+    │   ├── client.ts             # Database client configuration
+    │   └── schema.ts             # Database schema definitions
+    └── privy/
+        └── config.ts             # Privy configuration
+```
+
+### Adding NFT Minting Logic
+
+To implement actual NFT minting, update the `handleMint` function in `src/app/page.tsx`:
+
+```typescript
+const handleMint = async () => {
+  setIsMinting(true);
+  try {
+    // Add your NFT minting logic here
+    // For example:
+    // - Create contract instance
+    // - Call mint function
+    // - Handle transaction
+    // - Update UI with success/failure
+  } catch (error) {
+    console.error("Minting failed:", error);
+    // Handle error
+  } finally {
+    setIsMinting(false);
+  }
+};
+```
+
+## Next Steps
+
+1. **Set up Privy App ID** in environment variables
+2. **Test wallet connection** and challenge verification
+3. **Implement actual NFT minting** logic
+4. **Deploy to production** (Vercel recommended)
+
+## Support
+
+For issues or questions:
+
+- Check the [Privy Documentation](https://docs.privy.io)
+- Review the [Next.js Documentation](https://nextjs.org/docs)
+- Ensure database connection is working properly
+
+
