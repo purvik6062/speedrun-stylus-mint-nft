@@ -716,7 +716,9 @@ export default function HomePage() {
                               </div>
 
                               <motion.button
-                                onClick={(e) => handleMint()}
+                                onClick={(e) =>
+                                  handleMint(eligibility.githubUsername)
+                                }
                                 disabled={
                                   isMinting || hasMinted || isCheckingMinted
                                 }
