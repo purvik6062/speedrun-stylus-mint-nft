@@ -82,14 +82,14 @@ export const useMint = () => {
   const uploadImageToIPFS = async () => {
     try {
       // Fetch the GIF from the public folder
-      const response = await fetch("/nft-speedrun.gif");
+      const response = await fetch("/speedrun-stylus-nft.png");
       if (!response.ok) {
         throw new Error("Failed to fetch GIF");
       }
       const blob = await response.blob();
 
       // Create a File object for Pinata upload
-      const imageFile = new File([blob], "nft-speedrun.gif", {
+      const imageFile = new File([blob], "speedrun-stylus-nft.png", {
         type: blob.type,
       });
 
@@ -185,21 +185,21 @@ export const useMint = () => {
     }
     setIsMinting(true);
     try {
-      //   // Upload image to IPFS
-      //   const imageResult = await uploadImageToIPFS();
-      //   if (!imageResult) {
-      //     throw new Error("Failed to upload image to IPFS");
-      //   }
-      //   console.log("imageIpfsUrl", imageResult.ipfsUrl);
-      //   console.log("imageGatewayUrl", imageResult.gatewayUrl);
+      // // Upload image to IPFS
+      // const imageResult = await uploadImageToIPFS();
+      // if (!imageResult) {
+      //   throw new Error("Failed to upload image to IPFS");
+      // }
+      // console.log("imageIpfsUrl", imageResult.ipfsUrl);
+      // console.log("imageGatewayUrl", imageResult.gatewayUrl);
 
-      //   // Upload metadata to IPFS (using ipfs:// URL for image in metadata)
-      //   const metadataResult = await uploadMetadataToIPFS(imageResult.ipfsUrl);
-      //   if (!metadataResult) {
-      //     throw new Error("Failed to upload metadata to IPFS");
-      //   }
-      //   console.log("metadataIpfsUrl", metadataResult.ipfsUrl);
-      //   console.log("metadataGatewayUrl", metadataResult.gatewayUrl);
+      // // Upload metadata to IPFS (using ipfs:// URL for image in metadata)
+      // const metadataResult = await uploadMetadataToIPFS(imageResult.ipfsUrl);
+      // if (!metadataResult) {
+      //   throw new Error("Failed to upload metadata to IPFS");
+      // }
+      // console.log("metadataIpfsUrl", metadataResult.ipfsUrl);
+      // console.log("metadataGatewayUrl", metadataResult.gatewayUrl);
 
       // Mint NFT using the ipfs:// URL for metadata
       const hash = await writeContractAsync({
@@ -209,39 +209,39 @@ export const useMint = () => {
         // args: [address, metadataResult.ipfsUrl], // Use ipfs:// URL for contract
         args: [
           address,
-          "ipfs://QmU9vMP7Nk3MyxzReZ1tKKxEb7qm1VLEz7hxATJJheR6eJ",
+          "ipfs://QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
         ], // Use ipfs:// URL for contract
       });
       setTxHash(hash);
 
-      //   // Store minted NFT data in MongoDB
-      //   await storeMintedNFT(
-      //     hash,
-      //     metadataResult.gatewayUrl,
-      //     imageResult.gatewayUrl
-      //   );
+      // // Store minted NFT data in MongoDB
+      // await storeMintedNFT(
+      //   hash,
+      //   metadataResult.gatewayUrl,
+      //   imageResult.gatewayUrl
+      // );
 
-      //   // Set minted NFT data for display
-      //   setMintedNFT({
-      //     transactionHash: hash,
-      //     metadataUrl: metadataResult.gatewayUrl,
-      //     imageUrl: imageResult.gatewayUrl,
-      //   });
+      // // Set minted NFT data for display
+      // setMintedNFT({
+      //   transactionHash: hash,
+      //   metadataUrl: metadataResult.gatewayUrl,
+      //   imageUrl: imageResult.gatewayUrl,
+      // });
 
       // Store minted NFT data in MongoDB
       await storeMintedNFT(
         hash,
-        "https://gateway.pinata.cloud/ipfs/QmU9vMP7Nk3MyxzReZ1tKKxEb7qm1VLEz7hxATJJheR6eJ",
-        "https://gateway.pinata.cloud/ipfs/QmYPJRAZsUhg4zL6L4RVfKJmm5X2xATbX1aemv7Fs3L2me"
+        "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
+        "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh"
       );
 
       // Set minted NFT data for display
       setMintedNFT({
         transactionHash: hash,
         metadataUrl:
-          "https://gateway.pinata.cloud/ipfs/QmU9vMP7Nk3MyxzReZ1tKKxEb7qm1VLEz7hxATJJheR6eJ",
+          "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
         imageUrl:
-          "https://gateway.pinata.cloud/ipfs/QmYPJRAZsUhg4zL6L4RVfKJmm5X2xATbX1aemv7Fs3L2me",
+          "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh",
       });
     } catch (err) {
       console.error("Minting failed:", err);
