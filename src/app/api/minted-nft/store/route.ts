@@ -4,7 +4,13 @@ import { connectToDatabase, MintedNFT } from "@/lib/database/mongodb";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userAddress, transactionHash, metadataUrl, imageUrl } = body;
+    const {
+      userAddress,
+      transactionHash,
+      metadataUrl,
+      imageUrl,
+      githubUsername,
+    } = body;
 
     if (!userAddress || !transactionHash || !metadataUrl || !imageUrl) {
       return NextResponse.json(
@@ -35,6 +41,7 @@ export async function POST(request: NextRequest) {
       imageUrl,
       mintedAt: new Date(),
       network: "arbitrum-sepolia",
+      ...(githubUsername ? { githubUsername } : {}),
     };
 
     const result = await collection.insertOne(mintedNFT);

@@ -34,4 +34,5 @@ export interface MintedNFT {
   imageUrl: string;
   mintedAt: Date;
   network: string;
+  githubUsername?: string;
 }

@@ -17,6 +17,7 @@ interface EligibilityData {
   completedRequiredChallenges: number;
   requiredChallenges: number;
   challengeDetails: ChallengeDetail[];
+  githubUsername?: string;
 }
 
 export function useEligibility(userAddress: string | null) {

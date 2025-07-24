@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         challengeId: userChallenges.challengeId,
         reviewAction: userChallenges.reviewAction,
         submittedAt: userChallenges.submittedAt,
+        githubUsername: userChallenges.githubUsername,
       })
       .from(userChallenges)
       .where(
@@ -58,8 +59,8 @@ export async function POST(request: NextRequest) {
         )
       );
 
-      // console.log("Completed challenges found:", completedChallenges);
-      // console.log("Required challenges:", REQUIRED_CHALLENGES);
+    // console.log("Completed challenges found:", completedChallenges);
+    // console.log("Required challenges:", REQUIRED_CHALLENGES);
 
     // Check if all required challenges are completed
     const completedChallengeIds = completedChallenges.map((c) => c.challengeId);
@@ -76,6 +77,18 @@ export async function POST(request: NextRequest) {
       (challengeId) => completedChallengeIds.includes(challengeId)
     ).length;
 
+    // Get githubUsername from the most recent accepted challenge (if any)
+    let githubUsername = null;
+    if (completedChallenges.length > 0) {
+      // Sort by submittedAt descending and take the first non-null githubUsername
+      const sorted = [...completedChallenges].sort(
+        (a, b) =>
+          new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
+      );
+      githubUsername =
+        sorted.find((c) => c.githubUsername)?.githubUsername || null;
+    }
+
     const eligibilityData = {
       isEligible: hasAllRequiredChallenges,
       userAddress: userAddress,
@@ -89,6 +102,7 @@ export async function POST(request: NextRequest) {
           completedChallenges.find((c) => c.challengeId === challengeId) ||
           null,
       })),
+      githubUsername,
     };
 
     // console.log("Final eligibility data:", eligibilityData);

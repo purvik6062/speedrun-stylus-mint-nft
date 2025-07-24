@@ -150,7 +150,8 @@ export const useMint = () => {
   const storeMintedNFT = async (
     transactionHash: string,
     metadataUrl: string,
-    imageUrl: string
+    imageUrl: string,
+    githubUsername?: string
   ) => {
     try {
       const response = await fetch("/api/minted-nft/store", {
@@ -163,6 +164,7 @@ export const useMint = () => {
           transactionHash,
           metadataUrl,
           imageUrl,
+          ...(githubUsername ? { githubUsername } : {}),
         }),
       });
 
@@ -178,7 +180,7 @@ export const useMint = () => {
     }
   };
 
-  const handleMint = async () => {
+  const handleMint = async (githubUsername?: string) => {
     if (!address) {
       alert("Please connect your wallet.");
       return;
@@ -232,7 +234,8 @@ export const useMint = () => {
       await storeMintedNFT(
         hash,
         "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
-        "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh"
+        "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh",
+        githubUsername
       );
 
       // Set minted NFT data for display

@@ -716,7 +716,7 @@ export default function HomePage() {
                               </div>
 
                               <motion.button
-                                onClick={handleMint}
+                                onClick={(e) => handleMint()}
                                 disabled={
                                   isMinting || hasMinted || isCheckingMinted
                                 }
