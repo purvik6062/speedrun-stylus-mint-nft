@@ -82,14 +82,16 @@ export const useMint = () => {
   const uploadImageToIPFS = async () => {
     try {
       // Fetch the GIF from the public folder
-      const response = await fetch("/speedrun-stylus-nft.png");
+      // const response = await fetch("/speedrun-stylus-nft.png");
+      const response = await fetch("/participation-nft.png");
       if (!response.ok) {
         throw new Error("Failed to fetch GIF");
       }
       const blob = await response.blob();
 
       // Create a File object for Pinata upload
-      const imageFile = new File([blob], "speedrun-stylus-nft.png", {
+      // const imageFile = new File([blob], "speedrun-stylus-nft.png", {
+      const imageFile = new File([blob], "participation-nft.png", {
         type: blob.type,
       });
 
@@ -112,13 +114,13 @@ export const useMint = () => {
   const uploadMetadataToIPFS = async (imageIpfsUrl: string) => {
     try {
       const metadata = {
-        name: "Speedrun Stylus",
-        description: "Awarded for completing first three challenges.",
+        name: "Participation NFT",
+        description: "Awarded for completing the challenges.",
         image: imageIpfsUrl, // Use ipfs:// URL in metadata
         attributes: [
           {
             trait_type: "Achievement",
-            value: "First Three Challenges",
+            value: "Challenges",
           },
           {
             trait_type: "Platform",
@@ -209,9 +211,13 @@ export const useMint = () => {
         abi: CONTRACT_ABI,
         functionName: "safeMint",
         // args: [address, metadataResult.ipfsUrl], // Use ipfs:// URL for contract
+        // args: [
+        //   address,
+        //   "ipfs://QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
+        // ], // Use ipfs:// URL for contract
         args: [
           address,
-          "ipfs://QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
+          "ipfs://QmfDnwK3xWmQi1jJBJdcpMspu1xfDnpzn7R8fqzpWHiDzg",
         ], // Use ipfs:// URL for contract
       });
       setTxHash(hash);
@@ -220,7 +226,8 @@ export const useMint = () => {
       // await storeMintedNFT(
       //   hash,
       //   metadataResult.gatewayUrl,
-      //   imageResult.gatewayUrl
+      //   imageResult.gatewayUrl,
+      //   githubUsername
       // );
 
       // // Set minted NFT data for display
@@ -231,10 +238,27 @@ export const useMint = () => {
       // });
 
       // Store minted NFT data in MongoDB
+      // await storeMintedNFT(
+      //   hash,
+      //   "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
+      //   "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh",
+      //   githubUsername
+      // );
+
+      // // Set minted NFT data for display
+      // setMintedNFT({
+      //   transactionHash: hash,
+      //   metadataUrl:
+      //     "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
+      //   imageUrl:
+      //     "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh",
+      // });
+
+      // // Store minted NFT data in MongoDB
       await storeMintedNFT(
         hash,
-        "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
-        "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh",
+        "https://gateway.pinata.cloud/ipfs/QmfDnwK3xWmQi1jJBJdcpMspu1xfDnpzn7R8fqzpWHiDzg",
+        "https://gateway.pinata.cloud/ipfs/QmRxjxsC6kxPSoT2ouu1RRFsmBU8hjs53TEaAiHLJWKhJg",
         githubUsername
       );
 
@@ -242,9 +266,9 @@ export const useMint = () => {
       setMintedNFT({
         transactionHash: hash,
         metadataUrl:
-          "https://gateway.pinata.cloud/ipfs/QmcyJ5rUWMwqu62afZvTDvqcJ1jfRWdTEhuxePMnHN6LTN",
+          "https://gateway.pinata.cloud/ipfs/QmfDnwK3xWmQi1jJBJdcpMspu1xfDnpzn7R8fqzpWHiDzg",
         imageUrl:
-          "https://gateway.pinata.cloud/ipfs/QmWs5M9ZhuCEJTQSmiqWE6zZxW2LJH18EyDSq8HZ1AWKAh",
+          "https://gateway.pinata.cloud/ipfs/QmRxjxsC6kxPSoT2ouu1RRFsmBU8hjs53TEaAiHLJWKhJg",
       });
     } catch (err) {
       console.error("Minting failed:", err);
