@@ -37,9 +37,34 @@ export enum UserRole {
 
 // Challenge IDs that we're tracking
 export enum ChallengeId {
+  // Web3 Basics with stylus (Challenges 1-3)
   SIMPLE_COUNTER_EXAMPLE = "simple-counter-example",
   SIMPLE_NFT_EXAMPLE = "simple-nft-example",
   VENDING_MACHINE = "vending-machine",
+
+  // Core Stylus Engineering (Challenge 4-5)
+  MULTISIG_WALLET = "multisig-wallet",
+  UNISWAP_V2_STYLUS = "uniswap-v2-stylus",
+
+  // ZKP Basics with stylus (Ch 6-8)
+  ZKP_AGE = "zkp-age",
+  ZKP_BALANCE = "zkp-balance",
+  ZKP_PASSWORD = "zkp-password",
+
+  // ZKP Advanced with stylus (Ch 9-11)
+  ZKP_LOCATION = "zkp-location",
+  ZKP_MODEL = "zkp-model",
+  ZKP_PUBLIC_DOC_VERIFIER = "zkp-public-doc-verifier",
+
+  // Agentic DeFi Basics (Ch 12)
+  VIBEKIT_SETUP = "vibekit-setup",
+
+  // Agentic Wallets & Signals (Ch 13-14)
+  VIBEKIT_BASIC_AGENTS = "vibekit-basic-agents",
+  VIBEKIT_ADVANCED_AGENTS = "vibekit-advanced-agents",
+
+  // Farcaster Miniapps with stylus (Ch 15)
+  FARCASTER_MINIAPPS = "farcaster-miniapps",
 }
 
 // Users table

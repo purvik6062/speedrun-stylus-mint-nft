@@ -10,6 +10,17 @@ interface ChallengeDetail {
   } | null;
 }
 
+interface CertificationLevel {
+  levelKey: string;
+  name: string;
+  description: string;
+  level: number;
+  isEligible: boolean;
+  completedRequiredChallenges: number;
+  requiredChallenges: number;
+  challengeDetails: ChallengeDetail[];
+}
+
 interface EligibilityData {
   isEligible: boolean;
   userAddress: string;
@@ -18,6 +29,8 @@ interface EligibilityData {
   requiredChallenges: number;
   challengeDetails: ChallengeDetail[];
   githubUsername?: string;
+  certificationLevels: CertificationLevel[];
+  highestEligibleLevel: CertificationLevel | null;
 }
 
 export function useEligibility(userAddress: string | null) {

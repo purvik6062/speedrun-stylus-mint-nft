@@ -3,13 +3,14 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useEligibility } from "@/hooks/useEligibility";
 import { useMintedStatus } from "@/hooks/useMintedStatus";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/GlassCard";
 import { FloatingParticles } from "@/components/FloatingParticles";
 import { WalletConnection } from "@/components/WalletConnection";
 import { MintedNFTDisplay } from "@/components/MintedNFTDisplay";
 import { SuccessfulMint } from "@/components/SuccessfulMint";
+import { useRouter } from "next/navigation";
 import {
   Wallet,
   Shield,
@@ -29,11 +30,24 @@ import {
   Rocket,
 } from "lucide-react";
 import { useMint } from "../hooks/useMint";
+import { CertificationLevels } from "@/components/CertificationLevels";
 
 const CHALLENGE_NAMES = {
   "simple-counter-example": "Simple Counter Example",
   "simple-nft-example": "Simple NFT Example",
   "vending-machine": "Vending Machine",
+  "multisig-wallet": "Multisig Wallet",
+  "uniswap-v2-stylus": "Uniswap V2 Stylus",
+  "zkp-age": "ZKP Age Verification",
+  "zkp-balance": "ZKP Balance Proof",
+  "zkp-password": "ZKP Password Verification",
+  "zkp-location": "ZKP Location Proof",
+  "zkp-model": "ZKP Model Verification",
+  "zkp-public-doc-verifier": "ZKP Public Document Verifier",
+  "vibekit-setup": "VibeKit Setup",
+  "vibekit-basic-agents": "VibeKit Basic Agents",
+  "vibekit-advanced-agents": "VibeKit Advanced Agents",
+  "farcaster-miniapps": "Farcaster Miniapps",
 };
 
 const CHALLENGE_DESCRIPTIONS = {
@@ -41,12 +55,33 @@ const CHALLENGE_DESCRIPTIONS = {
     "Build a basic counter smart contract with increment and decrement functionality",
   "simple-nft-example": "Create an NFT contract with minting capabilities",
   "vending-machine": "Develop a vending machine contract with purchase logic",
+  "multisig-wallet": "Build a multi-signature wallet for secure transactions",
+  "uniswap-v2-stylus": "Implement Uniswap V2-style DEX functionality with Stylus",
+  "zkp-age": "Create zero-knowledge proof for age verification without revealing actual age",
+  "zkp-balance": "Implement zero-knowledge proof for balance verification",
+  "zkp-password": "Build zero-knowledge proof system for password verification",
+  "zkp-location": "Develop zero-knowledge proof for location verification",
+  "zkp-model": "Create zero-knowledge proof for model verification",
+  "zkp-public-doc-verifier": "Build zero-knowledge proof system for public document verification",
+  "vibekit-setup": "Set up VibeKit for agentic DeFi applications",
+  "vibekit-basic-agents": "Implement basic VibeKit agents for DeFi automation",
+  "vibekit-advanced-agents": "Create advanced VibeKit agents with complex strategies",
+  "farcaster-miniapps": "Build Farcaster miniapps using Stylus technology",
 };
 
 export default function HomePage() {
   const { handleMint, isMinting, isMined, mintedNFT } = useMint();
+  const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const { ready, authenticated, login, logout, user } = usePrivy();
   const userAddress = user?.wallet?.address || null;
+  const router = useRouter();
+
+  // Redirect to NFT page when minting is successful
+  useEffect(() => {
+    if (isMined && selectedLevel) {
+      router.push(`/nft/${selectedLevel}?justMinted=true`);
+    }
+  }, [isMined, selectedLevel, router]);
   const {
     data: eligibility,
     isLoading: isCheckingEligibility,
@@ -56,9 +91,16 @@ export default function HomePage() {
   const {
     hasMinted,
     nft: existingNFT,
+    nfts: mintedNFTs,
+    totalMinted,
     isLoading: isCheckingMinted,
     refetch: refetchMintedStatus,
   } = useMintedStatus(userAddress);
+
+  const handleMintLevel = async (levelKey: string) => {
+    setSelectedLevel(levelKey);
+    await handleMint(eligibility?.githubUsername, levelKey);
+  };
 
   if (!ready) {
     return (
@@ -190,15 +232,15 @@ export default function HomePage() {
             className="space-y-4"
           >
             <h2 className="text-3xl font-bold text-slate-100 mb-2">
-              NFT Badge Collection
+              Multi-Level NFT Badge Collection
             </h2>
             <p className="text-xl text-slate-300 max-w-4xl mx-auto leading-relaxed">
-              Complete the first 3 Speedrun Stylus challenges and mint your
+              Complete challenges across 7 different certification levels and mint your
               exclusive{" "}
               <span className="text-amber-300 font-bold bg-amber-400/10 px-2 py-1 rounded-lg">
-                Golden Achievement Badge
+                Achievement Badges
               </span>{" "}
-              on Arbitrum Sepolia!
+              on Arbitrum Sepolia! Each level unlocks a unique NFT badge.
             </p>
           </motion.div>
         </motion.div>
@@ -208,12 +250,6 @@ export default function HomePage() {
           <AnimatePresence mode="wait">
             {!authenticated ? (
               <WalletConnection onLogin={login} />
-            ) : mintedNFT ? (
-              /* Show successful mint */
-              <SuccessfulMint mintedNFT={mintedNFT} />
-            ) : hasMinted && existingNFT ? (
-              /* Show already minted NFT */
-              <MintedNFTDisplay nft={existingNFT} />
             ) : (
               /* Authenticated User Section */
               <motion.div
@@ -256,9 +292,9 @@ export default function HomePage() {
                           <p className="text-slate-300 font-mono text-lg bg-blue-500/10 px-4 py-2 rounded-lg border border-blue-500/20">
                             {userAddress
                               ? `${userAddress.slice(
-                                  0,
-                                  8
-                                )}...${userAddress.slice(-6)}`
+                                0,
+                                8
+                              )}...${userAddress.slice(-6)}`
                               : "Loading..."}
                           </p>
                           <p className="text-sm text-slate-400 flex items-center gap-2 mt-2">
@@ -358,7 +394,7 @@ export default function HomePage() {
                       animate={{ opacity: 1 }}
                       className="space-y-8"
                     >
-                      {/* Overall Progress Summary with softer colors */}
+                      {/* Overall Progress Summary */}
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -379,152 +415,99 @@ export default function HomePage() {
                                 Your Achievement Overview
                               </h3>
                               <p className="text-slate-300 text-lg">
-                                Complete challenges to unlock rewards
+                                Complete challenges across all levels to unlock rewards
                               </p>
                             </div>
                           </div>
 
                           {/* Total Progress */}
                           <div className="bg-gradient-to-r from-blue-500/8 via-indigo-500/8 to-slate-500/8 border border-blue-400/20 rounded-3xl p-8 mb-8">
-                            <div className="flex items-center justify-between mb-6">
-                              <h4 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
-                                <Zap className="w-6 h-6 text-blue-400" />
-                                Total Challenges Completed
-                              </h4>
-                              <motion.span
-                                className="text-4xl font-black text-blue-400"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{
-                                  delay: 0.5,
-                                  type: "spring",
-                                  stiffness: 200,
-                                }}
-                              >
-                                {eligibility.totalCompletedChallenges}
-                              </motion.span>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div className="flex items-center justify-between">
+                                <h4 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
+                                  <Zap className="w-6 h-6 text-blue-400" />
+                                  Total Challenges Completed
+                                </h4>
+                                <motion.span
+                                  className="text-4xl font-black text-blue-400"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{
+                                    delay: 0.5,
+                                    type: "spring",
+                                    stiffness: 200,
+                                  }}
+                                >
+                                  {eligibility.totalCompletedChallenges}
+                                </motion.span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <h4 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
+                                  <Trophy className="w-6 h-6 text-amber-400" />
+                                  NFTs Minted
+                                </h4>
+                                <motion.span
+                                  className="text-4xl font-black text-amber-400"
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{
+                                    delay: 0.7,
+                                    type: "spring",
+                                    stiffness: 200,
+                                  }}
+                                >
+                                  {totalMinted}
+                                </motion.span>
+                              </div>
                             </div>
-                            <p className="text-slate-300 text-lg">
+                            <p className="text-slate-300 text-lg mt-4">
                               Great work! You&apos;ve completed{" "}
                               {eligibility.totalCompletedChallenges} challenge
                               {eligibility.totalCompletedChallenges !== 1
                                 ? "s"
                                 : ""}{" "}
-                              on Speedrun Stylus.
+                              and minted {totalMinted} NFT{totalMinted !== 1 ? "s" : ""} on Speedrun Stylus.
                             </p>
                           </div>
 
-                          {/* NFT Eligibility Section */}
-                          <motion.div
-                            className={`border-2 rounded-3xl p-8 ${
-                              eligibility.isEligible
-                                ? "bg-gradient-to-r from-emerald-500/8 to-green-500/8 border-emerald-400/40"
-                                : "bg-gradient-to-r from-amber-500/8 to-orange-500/8 border-amber-400/40"
-                            }`}
-                            whileHover={{ scale: 1.02 }}
-                            transition={{ type: "spring", stiffness: 300 }}
-                          >
-                            <div className="flex items-center justify-between mb-6">
-                              <h4 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
-                                <Gem
-                                  className={`w-6 h-6 ${
-                                    eligibility.isEligible
-                                      ? "text-emerald-400"
-                                      : "text-amber-400"
-                                  }`}
-                                />
-                                First NFT Badge Requirements
-                              </h4>
-                              <div className="flex items-center gap-3">
-                                <motion.span
-                                  className={`text-3xl font-bold ${
-                                    eligibility.isEligible
-                                      ? "text-emerald-400"
-                                      : "text-amber-400"
-                                  }`}
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  transition={{ delay: 0.7, type: "spring" }}
-                                >
-                                  {eligibility.completedRequiredChallenges}/
-                                  {eligibility.requiredChallenges}
-                                </motion.span>
-                                {eligibility.isEligible && (
-                                  <motion.div
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ delay: 0.9, type: "spring" }}
-                                  >
-                                    <CheckCircle className="w-8 h-8 text-emerald-400" />
-                                  </motion.div>
-                                )}
-                              </div>
-                            </div>
-
-                            <p
-                              className={`mb-6 text-lg ${
-                                eligibility.isEligible
-                                  ? "text-emerald-200"
-                                  : "text-amber-200"
-                              }`}
-                            >
-                              {eligibility.isEligible
-                                ? "🎉 Congratulations! You have completed all required challenges for your first NFT badge."
-                                : `Complete ${
-                                    eligibility.requiredChallenges -
-                                    eligibility.completedRequiredChallenges
-                                  } more required challenge${
-                                    eligibility.requiredChallenges -
-                                      eligibility.completedRequiredChallenges !==
-                                    1
-                                      ? "s"
-                                      : ""
-                                  } to unlock your first NFT badge.`}
-                            </p>
-
-                            {/* Progress Bar */}
-                            <div className="mb-4">
-                              <div className="flex items-center justify-between mb-3">
-                                <span className="text-lg font-semibold text-slate-100">
-                                  NFT Badge Progress
-                                </span>
-                                <span className="text-lg font-bold text-slate-300">
-                                  {Math.round(
-                                    (eligibility.completedRequiredChallenges /
-                                      eligibility.requiredChallenges) *
-                                      100
-                                  )}
-                                  %
-                                </span>
-                              </div>
-                              <div className="w-full bg-slate-700/50 rounded-full h-4 overflow-hidden border border-slate-600/30">
+                          {/* Levels Overview */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {eligibility.certificationLevels.map((level) => {
+                              const hasMintedThisLevel = mintedNFTs.some(nft => nft.level === level.level);
+                              return (
                                 <motion.div
-                                  className={`h-4 rounded-full ${
-                                    eligibility.isEligible
-                                      ? "bg-gradient-to-r from-emerald-400/80 to-green-500/80"
-                                      : "bg-gradient-to-r from-amber-400/80 to-orange-500/80"
-                                  }`}
-                                  initial={{ width: 0 }}
-                                  animate={{
-                                    width: `${
-                                      (eligibility.completedRequiredChallenges /
-                                        eligibility.requiredChallenges) *
-                                      100
-                                    }%`,
-                                  }}
-                                  transition={{
-                                    duration: 1.5,
-                                    delay: 0.5,
-                                    ease: "easeOut",
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </motion.div>
+                                  key={level.levelKey}
+                                  className={`border-2 rounded-2xl p-4 text-center ${hasMintedThisLevel
+                                    ? "bg-gradient-to-r from-purple-500/8 to-pink-500/8 border-purple-400/40"
+                                    : level.isEligible
+                                      ? "bg-gradient-to-r from-emerald-500/8 to-green-500/8 border-emerald-400/40"
+                                      : "bg-gradient-to-r from-slate-800/30 to-slate-700/30 border-slate-600/40"
+                                    }`}
+                                  whileHover={{ scale: 1.05 }}
+                                  transition={{ type: "spring", stiffness: 300 }}
+                                >
+                                  <div className="text-2xl font-bold text-slate-100 mb-2">
+                                    Level {level.level}
+                                  </div>
+                                  <div className="text-sm text-slate-300 mb-2">
+                                    {level.completedRequiredChallenges}/{level.requiredChallenges}
+                                  </div>
+                                  <div className={`text-xs ${hasMintedThisLevel
+                                    ? "text-purple-300"
+                                    : level.isEligible
+                                      ? "text-emerald-300"
+                                      : "text-amber-300"
+                                    }`}>
+                                    {hasMintedThisLevel ? "Minted" : level.isEligible ? "Ready" : "In Progress"}
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
                         </GlassCard>
                       </motion.div>
 
-                      {/* Required Challenges Detail */}
+                      {/* Certification Levels */}
                       <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -542,306 +525,27 @@ export default function HomePage() {
                             </motion.div>
                             <div>
                               <h3 className="text-4xl font-bold text-slate-100 mb-2">
-                                Required Challenges for First NFT
+                                Certification Levels
                               </h3>
                               <p className="text-slate-300 text-lg">
-                                Complete these 3 specific challenges to mint
-                                your badge
+                                Complete challenges for each level to mint your NFT badges
                               </p>
                             </div>
                           </div>
 
-                          <div className="grid gap-8 mb-10">
-                            {eligibility.challengeDetails.map(
-                              (challenge, index) => (
-                                <motion.div
-                                  key={challenge.id}
-                                  className={`relative p-8 rounded-3xl border-2 transition-all duration-300 ${
-                                    challenge.completed
-                                      ? "bg-gradient-to-r from-emerald-500/8 to-green-500/8 border-emerald-400/40 shadow-lg shadow-emerald-500/10"
-                                      : "bg-gradient-to-r from-slate-800/30 to-slate-700/30 border-slate-600/40"
-                                  }`}
-                                  initial={{ opacity: 0, x: -20 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  transition={{ delay: 0.1 * index }}
-                                  whileHover={{ scale: 1.02, y: -5 }}
-                                >
-                                  <div className="flex items-center">
-                                    <div className="flex-shrink-0 mr-8">
-                                      {challenge.completed ? (
-                                        <motion.div
-                                          className="relative"
-                                          whileHover={{ rotate: 360 }}
-                                          transition={{ duration: 0.8 }}
-                                        >
-                                          <div className="w-20 h-20 bg-gradient-to-br from-emerald-400/80 to-green-500/80 rounded-2xl flex items-center justify-center relative">
-                                            <CheckCircle className="w-10 h-10 text-white" />
-                                            <div className="absolute inset-0 bg-emerald-400/20 rounded-2xl blur-lg animate-pulse"></div>
-                                          </div>
-                                          <motion.div
-                                            className="absolute -top-2 -right-2"
-                                            animate={{
-                                              rotate: 360,
-                                              scale: [1, 1.2, 1],
-                                            }}
-                                            transition={{
-                                              duration: 3,
-                                              repeat: Number.POSITIVE_INFINITY,
-                                            }}
-                                          >
-                                            <Star className="w-8 h-8 text-amber-300" />
-                                          </motion.div>
-                                        </motion.div>
-                                      ) : (
-                                        <div className="w-20 h-20 border-4 border-slate-500 border-dashed rounded-2xl flex items-center justify-center">
-                                          <Clock className="w-8 h-8 text-slate-400" />
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    <div className="flex-grow">
-                                      <h4 className="text-2xl font-bold text-slate-100 mb-3">
-                                        {index + 1}.{" "}
-                                        {
-                                          CHALLENGE_NAMES[
-                                            challenge.id as keyof typeof CHALLENGE_NAMES
-                                          ]
-                                        }
-                                      </h4>
-                                      <p className="text-slate-300 mb-4 text-lg leading-relaxed">
-                                        {
-                                          CHALLENGE_DESCRIPTIONS[
-                                            challenge.id as keyof typeof CHALLENGE_DESCRIPTIONS
-                                          ]
-                                        }
-                                      </p>
-                                      <div className="flex items-center gap-6">
-                                        <span
-                                          className={`px-4 py-2 rounded-full text-lg font-semibold ${
-                                            challenge.completed
-                                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                              : "bg-slate-600/20 text-slate-400 border border-slate-600/30"
-                                          }`}
-                                        >
-                                          {challenge.completed
-                                            ? "✓ Completed"
-                                            : "○ Pending"}
-                                        </span>
-                                        {challenge.details && (
-                                          <span className="text-sm text-slate-400 flex items-center gap-2 bg-slate-700/30 px-3 py-1 rounded-lg">
-                                            <Clock className="w-4 h-4" />
-                                            {new Date(
-                                              challenge.details.submittedAt
-                                            ).toLocaleDateString()}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </div>
-                                </motion.div>
-                              )
-                            )}
-                          </div>
+                          <CertificationLevels
+                            certificationLevels={eligibility.certificationLevels}
+                            onMint={handleMintLevel}
+                            isMinting={isMinting}
+                            selectedLevel={selectedLevel}
+                            hasMinted={hasMinted}
+                            isCheckingMinted={isCheckingMinted}
+                            mintedNFTs={mintedNFTs}
+                          />
                         </GlassCard>
                       </motion.div>
 
-                      {/* Mint Section */}
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4 }}
-                      >
-                        <GlassCard className="p-12 text-center backdrop-blur-xl bg-slate-800/20 border border-slate-700/30">
-                          {eligibility.isEligible ? (
-                            <motion.div
-                              initial={{ scale: 0.9, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              transition={{ duration: 0.8, ease: "easeOut" }}
-                            >
-                              <div className="mb-12">
-                                <motion.div
-                                  className="relative inline-block mb-8"
-                                  animate={{
-                                    scale: [1, 1.05, 1],
-                                    rotate: [0, 2, -2, 0],
-                                  }}
-                                  transition={{
-                                    duration: 4,
-                                    repeat: Number.POSITIVE_INFINITY,
-                                    repeatType: "reverse",
-                                  }}
-                                >
-                                  <div className="w-32 h-32 bg-gradient-to-br from-amber-400/80 via-orange-500/80 to-red-500/80 rounded-3xl flex items-center justify-center relative">
-                                    <Trophy className="w-16 h-16 text-white" />
-                                    <div className="absolute inset-0 bg-amber-400/30 rounded-3xl blur-2xl animate-pulse"></div>
-                                  </div>
 
-                                  <motion.div
-                                    className="absolute -inset-8"
-                                    animate={{ rotate: 360 }}
-                                    transition={{
-                                      duration: 15,
-                                      repeat: Number.POSITIVE_INFINITY,
-                                      ease: "linear",
-                                    }}
-                                  >
-                                    <Sparkles className="absolute top-0 left-1/2 w-8 h-8 text-amber-300" />
-                                    <Star className="absolute right-0 top-1/2 w-8 h-8 text-indigo-300" />
-                                    <Gem className="absolute bottom-0 left-1/2 w-8 h-8 text-blue-300" />
-                                    <Crown className="absolute left-0 top-1/2 w-8 h-8 text-slate-300" />
-                                  </motion.div>
-                                </motion.div>
-
-                                <motion.h2
-                                  className="text-5xl font-black bg-gradient-to-r from-amber-300 via-orange-300 to-red-300 bg-clip-text text-transparent mb-6"
-                                  initial={{ opacity: 0, y: 20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.2 }}
-                                >
-                                  🎉 Congratulations! 🎉
-                                </motion.h2>
-
-                                <motion.p
-                                  className="text-slate-100 text-2xl leading-relaxed max-w-3xl mx-auto"
-                                  initial={{ opacity: 0, y: 20 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.4 }}
-                                >
-                                  You&apos;ve completed all required challenges
-                                  and earned the right to mint your
-                                  <span className="text-amber-300 font-bold bg-amber-400/10 px-3 py-1 rounded-lg mx-2">
-                                    Exclusive Achievement Badge!
-                                  </span>
-                                </motion.p>
-                              </div>
-
-                              <motion.button
-                                onClick={(e) =>
-                                  handleMint(eligibility.githubUsername)
-                                }
-                                disabled={
-                                  isMinting || hasMinted || isCheckingMinted
-                                }
-                                className="group relative bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-8 px-16 rounded-3xl text-2xl transition-all duration-300 overflow-hidden shadow-2xl"
-                                whileHover={{
-                                  scale: 1.05,
-                                  boxShadow:
-                                    "0 30px 60px rgba(251, 191, 36, 0.5)",
-                                }}
-                                whileTap={{ scale: 0.95 }}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                              >
-                                <span className="relative z-10 flex items-center gap-4">
-                                  {isMinting ? (
-                                    <>
-                                      <Loader2 className="w-8 h-8 animate-spin" />
-                                      Minting Your Badge...
-                                    </>
-                                  ) : hasMinted ? (
-                                    <>
-                                      <CheckCircle className="w-8 h-8" />
-                                      Already Minted
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Gem className="w-8 h-8 group-hover:animate-bounce" />
-                                      Mint Your Achievement Badge
-                                      <Sparkles className="w-8 h-8 group-hover:animate-pulse" />
-                                    </>
-                                  )}
-                                </span>
-                                <motion.div
-                                  className="absolute inset-0 bg-gradient-to-r from-orange-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                  whileHover={{ scale: 1.1 }}
-                                />
-                              </motion.button>
-                              {isMined && !mintedNFT && (
-                                <motion.p
-                                  className="text-green-500 mt-4 text-xl"
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  transition={{ delay: 0.3 }}
-                                >
-                                  🎉 NFT minted successfully! Check your wallet
-                                  for your new badge!
-                                </motion.p>
-                              )}
-
-                              <motion.p
-                                className="text-sm text-amber-300/70 mt-8 flex items-center justify-center gap-2"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.8 }}
-                              >
-                                <Shield className="w-4 h-4" />
-                                Will be minted on Arbitrum Sepolia • Gas fees
-                                may apply
-                              </motion.p>
-                            </motion.div>
-                          ) : (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.8 }}
-                            >
-                              <div className="mb-12">
-                                <motion.div
-                                  className="w-32 h-32 bg-gradient-to-br from-amber-500/80 to-orange-500/80 rounded-3xl flex items-center justify-center mx-auto mb-8 relative"
-                                  animate={{ scale: [1, 1.05, 1] }}
-                                  transition={{
-                                    duration: 2,
-                                    repeat: Number.POSITIVE_INFINITY,
-                                  }}
-                                >
-                                  <Clock className="w-16 h-16 text-white" />
-                                  <div className="absolute inset-0 bg-amber-400/20 rounded-3xl blur-xl animate-pulse"></div>
-                                </motion.div>
-
-                                <h2 className="text-5xl font-bold text-amber-300 mb-6">
-                                  Keep Going! 💪
-                                </h2>
-                                <p className="text-slate-100 text-2xl leading-relaxed max-w-2xl mx-auto">
-                                  Complete all 3 required challenges to unlock
-                                  your exclusive achievement badge
-                                </p>
-                              </div>
-
-                              <div className="mb-12">
-                                <motion.button
-                                  disabled
-                                  className="bg-slate-600/50 text-slate-400 font-bold py-8 px-16 rounded-3xl text-2xl cursor-not-allowed border-2 border-slate-600/30"
-                                  whileHover={{ scale: 1.02 }}
-                                >
-                                  Complete Challenges to Mint
-                                </motion.button>
-                              </div>
-
-                              <motion.a
-                                href="https://Speedrunstylus.com"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-4 text-blue-300 hover:text-blue-200 font-bold text-xl transition-colors group bg-blue-500/10 px-8 py-4 rounded-2xl border border-blue-500/30"
-                                whileHover={{ scale: 1.05, y: -2 }}
-                                transition={{ type: "spring", stiffness: 300 }}
-                              >
-                                <Rocket className="w-6 h-6" />
-                                Visit Speedrun Stylus Platform
-                                <motion.div
-                                  animate={{ x: [0, 5, 0] }}
-                                  transition={{
-                                    duration: 1.5,
-                                    repeat: Number.POSITIVE_INFINITY,
-                                  }}
-                                >
-                                  <ExternalLink className="w-6 h-6" />
-                                </motion.div>
-                              </motion.a>
-                            </motion.div>
-                          )}
-                        </GlassCard>
-                      </motion.div>
                     </motion.div>
                   ) : null}
                 </AnimatePresence>

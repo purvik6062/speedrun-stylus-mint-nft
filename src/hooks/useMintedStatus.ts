@@ -1,15 +1,31 @@
 import { useState, useEffect } from "react";
 import { MintedNFT } from "@/lib/database/mongodb";
 
-export const useMintedStatus = (userAddress: string | null) => {
+interface MintedLevel {
+  level: number;
+  levelKey?: string;
+  levelName: string;
+  tokenId?: number;
+  transactionHash: string;
+  metadataUrl: string;
+  imageUrl: string;
+  mintedAt: Date;
+  network: string;
+}
+
+export const useMintedStatus = (userAddress: string | null, level?: number) => {
   const [mintedData, setMintedData] = useState<{
     hasMinted: boolean;
-    nft: MintedNFT | null;
+    nft: MintedLevel | null;
+    nfts: MintedLevel[];
+    totalMinted: number;
     isLoading: boolean;
     error: string | null;
   }>({
     hasMinted: false,
     nft: null,
+    nfts: [],
+    totalMinted: 0,
     isLoading: false,
     error: null,
   });
@@ -23,9 +39,11 @@ export const useMintedStatus = (userAddress: string | null) => {
     setMintedData((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const response = await fetch(
-        `/api/minted-nft/check?address=${userAddress}`
-      );
+      const url = level
+        ? `/api/minted-nft/check?address=${userAddress}&level=${level}`
+        : `/api/minted-nft/check?address=${userAddress}`;
+
+      const response = await fetch(url);
       const data = await response.json();
 
       if (!response.ok) {
@@ -34,7 +52,9 @@ export const useMintedStatus = (userAddress: string | null) => {
 
       setMintedData({
         hasMinted: data.hasMinted,
-        nft: data.nft,
+        nft: data.nft || null,
+        nfts: data.nfts || [],
+        totalMinted: data.totalMinted || 0,
         isLoading: false,
         error: null,
       });
@@ -50,7 +70,7 @@ export const useMintedStatus = (userAddress: string | null) => {
 
   useEffect(() => {
     checkMintedStatus();
-  }, [userAddress]);
+  }, [userAddress, level]);
 
   return {
     ...mintedData,

@@ -4,11 +4,63 @@ import { userChallenges } from "@/lib/database/schema";
 import { ReviewAction, ChallengeId } from "@/lib/database/schema";
 import { eq, and, or } from "drizzle-orm";
 
-const REQUIRED_CHALLENGES = [
-  ChallengeId.SIMPLE_COUNTER_EXAMPLE,
-  ChallengeId.SIMPLE_NFT_EXAMPLE,
-  ChallengeId.VENDING_MACHINE,
-];
+// Define all certification levels with their required challenges
+const CERTIFICATION_LEVELS = {
+  "web3-basics": {
+    name: "Web3 Basics with Stylus",
+    description: "Complete challenges 1-3 to earn your first NFT badge",
+    requiredChallenges: [
+      ChallengeId.SIMPLE_COUNTER_EXAMPLE,
+      ChallengeId.SIMPLE_NFT_EXAMPLE,
+      ChallengeId.VENDING_MACHINE,
+    ],
+    level: 1,
+  },
+  "core-stylus": {
+    name: "Core Stylus Engineering",
+    description: "Complete challenges 4-5 to earn your second NFT badge",
+    requiredChallenges: [ChallengeId.MULTISIG_WALLET, ChallengeId.UNISWAP_V2_STYLUS],
+    level: 2,
+  },
+  "zkp-basics": {
+    name: "ZKP Basics with Stylus",
+    description: "Complete challenges 6-8 to earn your third NFT badge",
+    requiredChallenges: [
+      ChallengeId.ZKP_AGE,
+      ChallengeId.ZKP_BALANCE,
+      ChallengeId.ZKP_PASSWORD,
+    ],
+    level: 3,
+  },
+  "zkp-advanced": {
+    name: "ZKP Advanced with Stylus",
+    description: "Complete challenges 9-11 to earn your fourth NFT badge",
+    requiredChallenges: [
+      ChallengeId.ZKP_LOCATION,
+      ChallengeId.ZKP_MODEL,
+      ChallengeId.ZKP_PUBLIC_DOC_VERIFIER,
+    ],
+    level: 4,
+  },
+  "agentic-defi": {
+    name: "Agentic DeFi Basics",
+    description: "Complete challenge 12 to earn your fifth NFT badge",
+    requiredChallenges: [ChallengeId.VIBEKIT_SETUP],
+    level: 5,
+  },
+  "agentic-wallets": {
+    name: "Agentic Wallets & Signals",
+    description: "Complete challenges 13-14 to earn your sixth NFT badge",
+    requiredChallenges: [ChallengeId.VIBEKIT_BASIC_AGENTS, ChallengeId.VIBEKIT_ADVANCED_AGENTS],
+    level: 6,
+  },
+  "farcaster-miniapps": {
+    name: "Farcaster Miniapps with Stylus",
+    description: "Complete challenge 15 to earn your final NFT badge",
+    requiredChallenges: [ChallengeId.FARCASTER_MINIAPPS],
+    level: 7,
+  },
+};
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,26 +73,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // console.log("Checking eligibility for address:", userAddress);
-
-    // First, let's try to find any records for this user to debug
-    const allUserRecords = await db
-      .select()
-      .from(userChallenges)
-      .where(eq(userChallenges.userAddress, userAddress));
-
-    // console.log("All records for user (exact case):", allUserRecords);
-
-    // Also try lowercase
-    const allUserRecordsLower = await db
-      .select()
-      .from(userChallenges)
-      .where(eq(userChallenges.userAddress, userAddress.toLowerCase()));
-
-    // console.log("All records for user (lowercase):", allUserRecordsLower);
-
-    // Query the database to check if user has completed all required challenges
-    // Try both exact case and lowercase to handle case sensitivity issues
+    // Query the database to check if user has completed all challenges
     const completedChallenges = await db
       .select({
         challengeId: userChallenges.challengeId,
@@ -59,28 +92,11 @@ export async function POST(request: NextRequest) {
         )
       );
 
-    // console.log("Completed challenges found:", completedChallenges);
-    // console.log("Required challenges:", REQUIRED_CHALLENGES);
-
-    // Check if all required challenges are completed
     const completedChallengeIds = completedChallenges.map((c) => c.challengeId);
-    // console.log("Completed challenge IDs:", completedChallengeIds);
-
-    const hasAllRequiredChallenges = REQUIRED_CHALLENGES.every((challengeId) =>
-      completedChallengeIds.includes(challengeId)
-    );
-
-    console.log("Has all required challenges:", hasAllRequiredChallenges);
-
-    // Count how many of the required challenges are completed
-    const completedRequiredChallenges = REQUIRED_CHALLENGES.filter(
-      (challengeId) => completedChallengeIds.includes(challengeId)
-    ).length;
 
     // Get githubUsername from the most recent accepted challenge (if any)
     let githubUsername = null;
     if (completedChallenges.length > 0) {
-      // Sort by submittedAt descending and take the first non-null githubUsername
       const sorted = [...completedChallenges].sort(
         (a, b) =>
           new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime()
@@ -89,23 +105,61 @@ export async function POST(request: NextRequest) {
         sorted.find((c) => c.githubUsername)?.githubUsername || null;
     }
 
+    // Check eligibility for each certification level
+    const certificationEligibility = Object.entries(CERTIFICATION_LEVELS).map(
+      ([key, level]) => {
+        const hasAllRequiredChallenges = level.requiredChallenges.every(
+          (challengeId) => completedChallengeIds.includes(challengeId)
+        );
+
+        const completedRequiredChallenges = level.requiredChallenges.filter(
+          (challengeId) => completedChallengeIds.includes(challengeId)
+        ).length;
+
+        return {
+          levelKey: key,
+          name: level.name,
+          description: level.description,
+          level: level.level,
+          isEligible: hasAllRequiredChallenges,
+          completedRequiredChallenges,
+          requiredChallenges: level.requiredChallenges.length,
+          challengeDetails: level.requiredChallenges.map((challengeId) => ({
+            id: challengeId,
+            completed: completedChallengeIds.includes(challengeId),
+            details:
+              completedChallenges.find((c) => c.challengeId === challengeId) ||
+              null,
+          })),
+        };
+      }
+    );
+
+    // Find the highest level the user is eligible for
+    const eligibleLevels = certificationEligibility.filter(
+      (level) => level.isEligible
+    );
+    const highestEligibleLevel =
+      eligibleLevels.length > 0
+        ? eligibleLevels.reduce((prev, current) =>
+            prev.level > current.level ? prev : current
+          )
+        : null;
+
     const eligibilityData = {
-      isEligible: hasAllRequiredChallenges,
       userAddress: userAddress,
-      totalCompletedChallenges: completedChallenges.length, // All completed challenges
-      completedRequiredChallenges: completedRequiredChallenges, // Only the required ones
-      requiredChallenges: REQUIRED_CHALLENGES.length,
-      challengeDetails: REQUIRED_CHALLENGES.map((challengeId) => ({
-        id: challengeId,
-        completed: completedChallengeIds.includes(challengeId),
-        details:
-          completedChallenges.find((c) => c.challengeId === challengeId) ||
-          null,
-      })),
+      totalCompletedChallenges: completedChallenges.length,
       githubUsername,
+      certificationLevels: certificationEligibility,
+      highestEligibleLevel,
+      // For backward compatibility, keep the first level as the default
+      isEligible: certificationEligibility[0]?.isEligible || false,
+      completedRequiredChallenges:
+        certificationEligibility[0]?.completedRequiredChallenges || 0,
+      requiredChallenges: certificationEligibility[0]?.requiredChallenges || 0,
+      challengeDetails: certificationEligibility[0]?.challengeDetails || [],
     };
 
-    // console.log("Final eligibility data:", eligibilityData);
     return NextResponse.json(eligibilityData);
   } catch (error) {
     console.error("Error checking eligibility:", error);

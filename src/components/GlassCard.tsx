@@ -21,7 +21,7 @@ export function GlassCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay }}
-      whileHover={hover ? { y: -5, scale: 1.02 } : undefined}
+      // whileHover={hover ? { y: -5, scale: 1.02 } : undefined}
       className={`
         relative overflow-hidden rounded-3xl 
         bg-white/5 backdrop-blur-xl 
