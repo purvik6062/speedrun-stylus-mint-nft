@@ -18,8 +18,14 @@ const CERTIFICATION_LEVELS = {
   },
   "core-stylus": {
     name: "Core Stylus Engineering",
-    description: "Complete challenges 4-5 to earn your second NFT badge",
-    requiredChallenges: [ChallengeId.MULTISIG_WALLET, ChallengeId.UNISWAP_V2_STYLUS],
+    description: "Complete challenges 1-5 to earn your second NFT badge",
+    requiredChallenges: [
+      ChallengeId.SIMPLE_COUNTER_EXAMPLE,
+      ChallengeId.SIMPLE_NFT_EXAMPLE,
+      ChallengeId.VENDING_MACHINE,
+      ChallengeId.MULTISIG_WALLET,
+      ChallengeId.UNISWAP_V2_STYLUS,
+    ],
     level: 2,
   },
   "zkp-basics": {
@@ -34,8 +40,11 @@ const CERTIFICATION_LEVELS = {
   },
   "zkp-advanced": {
     name: "ZKP Advanced with Stylus",
-    description: "Complete challenges 9-11 to earn your fourth NFT badge",
+    description: "Complete challenges 6-11 to earn your fourth NFT badge",
     requiredChallenges: [
+      ChallengeId.ZKP_AGE,
+      ChallengeId.ZKP_BALANCE,
+      ChallengeId.ZKP_PASSWORD,
       ChallengeId.ZKP_LOCATION,
       ChallengeId.ZKP_MODEL,
       ChallengeId.ZKP_PUBLIC_DOC_VERIFIER,
@@ -50,8 +59,12 @@ const CERTIFICATION_LEVELS = {
   },
   "agentic-wallets": {
     name: "Agentic Wallets & Signals",
-    description: "Complete challenges 13-14 to earn your sixth NFT badge",
-    requiredChallenges: [ChallengeId.VIBEKIT_BASIC_AGENTS, ChallengeId.VIBEKIT_ADVANCED_AGENTS],
+    description: "Complete challenges 12-14 to earn your sixth NFT badge",
+    requiredChallenges: [
+      ChallengeId.VIBEKIT_SETUP,
+      ChallengeId.VIBEKIT_BASIC_AGENTS,
+      ChallengeId.VIBEKIT_ADVANCED_AGENTS,
+    ],
     level: 6,
   },
   "farcaster-miniapps": {

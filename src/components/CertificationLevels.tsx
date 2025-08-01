@@ -40,7 +40,7 @@ interface CertificationLevel {
 
 interface CertificationLevelsProps {
   certificationLevels: CertificationLevel[];
-  onMint: (levelKey: string) => void;
+  onMint: (levelKey: string, levelName: string, level: number) => void;
   isMinting: boolean;
   selectedLevel: string | null;
   hasMinted: boolean;
@@ -341,7 +341,7 @@ export function CertificationLevels({
                   const isThisLevelMinting = isMinting && selectedLevel === level.levelKey;
                   return (
                     <motion.button
-                      onClick={() => onMint(level.levelKey)}
+                      onClick={() => onMint(level.levelKey, level.name, level.level)}
                       disabled={isMinting || isCheckingMinted}
                       className="group relative bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-bold py-6 px-12 rounded-2xl text-xl transition-all duration-300 overflow-hidden shadow-2xl"
                       whileHover={{

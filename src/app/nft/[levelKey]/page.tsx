@@ -55,7 +55,7 @@ export default function NFTPage() {
         <FloatingParticles />
         <GlassCard className="p-12 text-center backdrop-blur-xl bg-slate-800/20 border border-slate-700/30">
           <motion.div
-            className="relative"
+            className="relative flex justify-center items-center"
             animate={{ rotate: 360 }}
             transition={{
               duration: 2,
@@ -64,7 +64,7 @@ export default function NFTPage() {
             }}
           >
             <Loader2 className="w-16 h-16 text-blue-400" />
-            <div className="absolute inset-0 w-16 h-16 border-4 border-blue-400/20 rounded-full animate-pulse"></div>
+            {/* <div className="flex justify-centerabsolute inset-0 w-16 h-16 border-4 border-blue-400/20 rounded-full animate-pulse"></div> */}
           </motion.div>
           <h2 className="text-2xl font-bold text-slate-100 mt-6 mb-4">Loading NFT...</h2>
           <p className="text-slate-300">Fetching your minted NFT data...</p>
@@ -132,9 +132,9 @@ export default function NFTPage() {
 
       <div className="relative z-10 container mx-auto px-4 py-12">
         {justMinted ? (
-          <SuccessfulMint mintedNFT={nft} />
+          <SuccessfulMint mintedNFT={nft} levelKey={levelKey as string} />
         ) : (
-          <MintedNFTDisplay nft={nft} />
+          <MintedNFTDisplay nft={nft} levelKey={levelKey as string} />
         )}
       </div>
     </div>

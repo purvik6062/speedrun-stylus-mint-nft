@@ -25,9 +25,20 @@ interface MintedLevel {
 
 interface MintedNFTDisplayProps {
   nft: MintedLevel;
+  levelKey: string;
 }
 
-export const MintedNFTDisplay = ({ nft }: MintedNFTDisplayProps) => {
+const LEVEL_NAME_MAP = {
+  "web3-basics": "Web3 Basics",
+  "core-stylus": "Core Stylus Engineering",
+  "zkp-basics": "ZKP Basics",
+  "zkp-advanced": "ZKP Advanced",
+  "agentic-defi": "Agentic DeFi Basics",
+  "agentic-wallets": "Agentic Wallets & Signals",
+  "farcaster-miniapps": "Farcaster Miniapps Challenge",
+};
+
+export const MintedNFTDisplay = ({ nft, levelKey }: MintedNFTDisplayProps) => {
   const imageCardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -323,7 +334,7 @@ export const MintedNFTDisplay = ({ nft }: MintedNFTDisplayProps) => {
                   ),
                 }}
               >
-                Awarded for completing first three challenges
+                Awarded for completing the {LEVEL_NAME_MAP[levelKey as keyof typeof LEVEL_NAME_MAP]} challenge
               </motion.p>
 
               <motion.p

@@ -97,9 +97,9 @@ export default function HomePage() {
     refetch: refetchMintedStatus,
   } = useMintedStatus(userAddress);
 
-  const handleMintLevel = async (levelKey: string) => {
+  const handleMintLevel = async (levelKey: string, levelName: string, level: number) => {
     setSelectedLevel(levelKey);
-    await handleMint(eligibility?.githubUsername, levelKey);
+    await handleMint(eligibility?.githubUsername, levelName, level, levelKey);
   };
 
   if (!ready) {

@@ -20,9 +20,20 @@ interface SuccessfulMintProps {
     imageUrl: string;
     mintedAt?: Date;
   };
+  levelKey: string;
 }
 
-export const SuccessfulMint = ({ mintedNFT }: SuccessfulMintProps) => {
+const LEVEL_NAME_MAP = {
+  "web3-basics": "Web3 Basics",
+  "core-stylus": "Core Stylus Engineering",
+  "zkp-basics": "ZKP Basics",
+  "zkp-advanced": "ZKP Advanced",
+  "agentic-defi": "Agentic DeFi Basics",
+  "agentic-wallets": "Agentic Wallets & Signals",
+  "farcaster-miniapps": "Farcaster Miniapps Challenge",
+};
+
+export const SuccessfulMint = ({ mintedNFT, levelKey }: SuccessfulMintProps) => {
   // 3D/hover state logic (copied from MintedNFTDisplay)
   const [isHovered, setIsHovered] = useState(false);
   const x = useMotionValue(0);
@@ -116,7 +127,7 @@ export const SuccessfulMint = ({ mintedNFT }: SuccessfulMintProps) => {
           >
             Your
             <span className="text-amber-300 font-bold bg-amber-400/10 px-3 py-1 rounded-lg mx-2">
-              Speedrun Stylus Achievement Badge
+              Speedrun Stylus: {LEVEL_NAME_MAP[levelKey as keyof typeof LEVEL_NAME_MAP]}
             </span>
             has been minted successfully!
           </motion.p>
@@ -289,7 +300,7 @@ export const SuccessfulMint = ({ mintedNFT }: SuccessfulMintProps) => {
                   ),
                 }}
               >
-                Awarded for completing first three challenges
+                Awarded for completing the {LEVEL_NAME_MAP[levelKey as keyof typeof LEVEL_NAME_MAP]} challenge
               </motion.p>
               <motion.p
                 className="text-xs text-slate-400"
